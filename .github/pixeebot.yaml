@@ -1,3 +1,4 @@
-additional_codemods:
-  - defectdojo:python/django-secure-set-cookie
-  - defectdojo:python/avoid-insecure-deserialization
+codemods:
+  prepend:
+    - defectdojo:python/django-secure-set-cookie
+    - defectdojo:python/avoid-insecure-deserialization
