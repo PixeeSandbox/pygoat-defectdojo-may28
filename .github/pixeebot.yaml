@@ -1,4 +1,5 @@
 codemods:
-  prepend:
-    - defectdojo:python/django-secure-set-cookie
+  only:
     - defectdojo:python/avoid-insecure-deserialization
+    - defectdojo:python/llm-sql-parameterization
+    - defectdojo:python/django-secure-set-cookie
