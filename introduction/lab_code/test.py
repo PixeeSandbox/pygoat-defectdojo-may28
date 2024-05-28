@@ -15,9 +15,12 @@ stderr = stderr.decode('utf-8')
 # print("Stdout\n" + data)
 print(data + stderr)
 '''
-import yaml, subprocess
+import subprocess
+
+import yaml
+
 stream = open('/home/fox/test.yaml', 'r')
-data = yaml.load(stream)
+data = yaml.load(stream, Loader=yaml.SafeLoader)
 
 '''
 stdout, stderr = data.communicate()

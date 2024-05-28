@@ -1,47 +1,47 @@
-import hashlib
-from django.shortcuts import render,redirect
-from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
-from .models import  FAANG, AF_session_id,info,login,comments,authLogin, tickits, sql_lab_table,Blogs,CF_user,AF_admin
-from django.core import serializers
-from requests.structures import CaseInsensitiveDict
-from django.contrib.auth import login,authenticate
-from django.contrib.auth.forms import UserCreationForm
-import random
-import string
-import os
-from hashlib import md5
+import base64
 import datetime
-from .forms import NewUserForm
-from django.contrib import messages
-#*****************************************Lab Requirements****************************************************#
-
-from .models import  FAANG,info,login,comments,otp
+import hashlib
+import json
+import logging
+import os
+import pickle
+import random
+import re
+import string
+import subprocess
+import uuid
+from dataclasses import dataclass
+from hashlib import md5
+from io import BytesIO
 from random import randint
-from xml.dom.pulldom import parseString, START_ELEMENT
-from xml.sax.handler import feature_external_ges
+from xml.dom.pulldom import START_ELEMENT, parseString
 from xml.sax import make_parser
-from django.views.decorators.csrf import csrf_exempt
+from xml.sax.handler import feature_external_ges
+
+import jwt
+import requests
+import yaml
+from argon2 import PasswordHasher
+from django.contrib import messages
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import UserCreationForm
+from django.core import serializers
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
+from django.shortcuts import redirect, render
 from django.template import loader
 from django.template.loader import render_to_string
-import subprocess
-import pickle
-import base64
-import yaml
-import json
-from dataclasses import dataclass
-import uuid
-from .utility import filter_blog, customHash
-import jwt
-from PIL import Image,ImageMath
-import base64
-from io import BytesIO
-from argon2 import PasswordHasher
-import logging
-import requests
-import re
-#*****************************************Login and Registration****************************************************#
+from django.views.decorators.csrf import csrf_exempt
+from PIL import Image, ImageMath
+from requests.structures import CaseInsensitiveDict
 
-print("HELLO DEMO")
+from .forms import NewUserForm
+from .models import (FAANG, AF_admin, AF_session_id, Blogs, CF_user, authLogin,
+                     comments, info, login, otp, sql_lab_table, tickits)
+from .utility import customHash, filter_blog
+
+#*****************************************Lab Requirements****************************************************#
+
+#*****************************************Login and Registration****************************************************#
 
 def register(request):
 	if request.method == "POST":
@@ -310,7 +310,7 @@ def auth_lab_login(request):
             try:
                 rendered = render_to_string('Lab/AUTH/auth_success.html', {'username': obj.username,'userid':obj.userid,'name':obj.name, 'err_msg':'Login Successful'})
                 response = HttpResponse(rendered)
-                response.set_cookie('userid', obj.userid, max_age=31449600)
+                response.set_cookie('userid', obj.userid, max_age=31449600, samesite=None, secure=False)
                 print('Login successful')
                 return response
             except:
@@ -550,7 +550,7 @@ def a9_lab(request):
             try :
                 file=request.FILES["file"]
                 try :
-                    data = yaml.load(file,yaml.Loader)
+                    data = yaml.load(file,yaml.SafeLoader)
                     
                     return render(request,"Lab/A9/a9_lab.html",{"data":data})
                 except:
@@ -1078,6 +1078,7 @@ def crypto_failure_lab3(request):
 
 #-----------------------------------------------SECURITY MISCONFIGURATION -------------------
 from pygoat.settings import SECRET_COOKIE_KEY
+
 
 def sec_misconfig_lab3(request):
     if not request.user.is_authenticated:
